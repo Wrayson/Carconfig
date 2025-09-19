@@ -1,0 +1,7 @@
+{
+	"/": [],
+	"/models": [
+		"src/routes/models/+page.server.ts"
+	],
+	"/models/configure": []
+}
