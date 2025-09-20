@@ -1,10 +1,11 @@
-// Node/ExpressJS Backend
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import { handler } from './build/handler.js';
 
+// Constants for environment
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 const MONGODB_URI = process.env.MONGODB_URI;
 
 // Middleware
@@ -18,7 +19,7 @@ mongoose.connect(MONGODB_URI)
     // If Connection to MongoDB didn't work, print
     .catch(err => console.error('Could not connect to MongoDB:', err));
 
-// Mongoose Schema für Konfigurationen
+// Mongoose Schema for Configuration Documents
 const configSchema = new mongoose.Schema({
     code: {
         type: String,
@@ -28,10 +29,15 @@ const configSchema = new mongoose.Schema({
     config: {
         type: Object,
         required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        expires: '7d' // MongoDB Automatically deletes Documents after 7d ('30' -> 30 seconds)
     }
 });
 
-// Mongoose Schema für Farboptionen
+// Mongoose Schema for Color Options Documents
 const optionSchema = new mongoose.Schema({
     type: { type: String, required: true, enum: ['car', 'rim', 'caliper'] },
     name: { type: String, required: true },
@@ -39,7 +45,7 @@ const optionSchema = new mongoose.Schema({
     price: { type: Number, required: true }
 });
 
-// Konstanten für die Mongoosche Schema-Modelle
+// Coonstants for MongoDB Schemas
 const CarOption = mongoose.model('car_options', optionSchema);
 const CarConfig = mongoose.model('car_configurations', configSchema);
 
@@ -98,11 +104,6 @@ app.get('/api/config/:code', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
-});
-
 // API endpoint to get all Car options
 // Returns ALL Options.
 app.get('/api/options', async (req, res) => {
@@ -123,4 +124,11 @@ app.get('/api/options', async (req, res) => {
         const response = createApiResponse('FAILED', 500, 'Failed to retrieve options');
         res.status(500).json(response);
     }
+});
+
+app.use(handler);
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Backend server running on http://localhost:${PORT}`);
 });

@@ -1,5 +1,5 @@
 const HOST_NAME = getBaseUrl();
-const HOST_PORT = 3000;
+const HOST_PORT = 80;
 
 // Helper Function, um die IP Adresse des Servers zu holen
 function getBaseUrl() {
